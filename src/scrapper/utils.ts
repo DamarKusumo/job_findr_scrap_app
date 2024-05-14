@@ -10,6 +10,12 @@ export const initDriver = async (url: string) => {
     return driver;
 }
 
+export const consoleData = (data: DataObject[]) => {
+    data.forEach(async item => {
+        console.log(item);
+    });
+}
+
 export const saveData = (data: DataObject[]) => {
     data.forEach(async item => {
         await save(item);
