@@ -2,15 +2,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { karirRunner } from "@/scrapper/karir";
 
-
-type Data = {
-  state: string;
-};
-
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>,
+  res: NextApiResponse,
 ) {
   await karirRunner();
-  res.status(200).json({ state: "Finish Hit" });
+  res.status(200).json({ status: 200, message: "Finish Hit" });
 }
