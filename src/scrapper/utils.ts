@@ -1,10 +1,19 @@
 import axios, { AxiosError } from "axios"
 import { DataObject } from "./interface";
 import selenium from 'selenium-webdriver';
+import { Options } from "selenium-webdriver/chrome";
 
 export const initDriver = async (url: string) => {
+    var options = new Options()
+    options.addArguments("--start-maximized")
+    options.addArguments("-disable-notifications")
+    // options.addArguments('--headless')
+    options.addArguments('--no-sandbox')
+    options.addArguments('--disable-dev-shm-usage')
+
     const driver = new selenium.Builder()
         .forBrowser('chrome')
+        // .setChromeOptions(options)
         .build();
     await driver.get(url);
     return driver;
