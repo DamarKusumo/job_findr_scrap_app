@@ -77,16 +77,16 @@ const getData = async (driver: WebDriver, jobType: string) => {
 
     if (new Date(publicationDate) < maxDate) continue;
 
-    let temp /*: DataObject*/ = {
+    let temp: DataObject = {
       id: "",
       title: "",
       publicationDate: "",
       location: "",
       company: "",
       sourceSite: "LinkedIn Job",
-      link: "",
-      logo: "",
-      role: jobType,
+      linkDetail: "",
+      logoImgLink: "",
+      position: jobType,
     };
 
     // handle lazy load huhu
@@ -97,7 +97,7 @@ const getData = async (driver: WebDriver, jobType: string) => {
       "arguments[0].scrollIntoView(true);",
       companyImg
     );
-    temp.logo = await companyImg.getAttribute("src");
+    temp.logoImgLink = await companyImg.getAttribute("src");
     temp.id = "linkedin:".concat(
       (
         await job
@@ -118,7 +118,7 @@ const getData = async (driver: WebDriver, jobType: string) => {
     temp.company = await job
       .findElement(By.className("base-search-card__subtitle"))
       .getAttribute("innerText");
-    temp.link = await job.findElement(By.css("a")).getAttribute("href");
+    temp.linkDetail = await job.findElement(By.css("a")).getAttribute("href");
 
     data.push(temp);
   }
