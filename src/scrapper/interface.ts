@@ -5,5 +5,7 @@ export interface DataObject {
     location: string;
     company: string;
     sourceSite: string;
-    link: string;
+    linkDetail: string;
+    logoImgLink: string;
+    position: string;
 }
