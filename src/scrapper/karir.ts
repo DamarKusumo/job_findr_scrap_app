@@ -21,6 +21,7 @@ export const save = async (job: string) => {
 
     for (const container of containers) {
         let temp: DataObject = {
+            id: "",
             title: "",
             publicationDate: "",
             location: "",
@@ -41,7 +42,7 @@ export const save = async (job: string) => {
         console.log(temp);
         await driver.wait(until.elementLocated(By.id("job-header-wrapper")), 10000);
         const detail = await outerDiv.findElement(By.id("job-header-wrapper"));
-       
+
         // console.log(text);
         console.log("------------");
 
