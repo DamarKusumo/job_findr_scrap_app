@@ -21,12 +21,15 @@ export const save = async (job: string) => {
 
     for (const container of containers) {
         let temp: DataObject = {
+            id: "",
             title: "",
             publicationDate: "",
             location: "",
             company: "",
             sourceSite: "Karir.com",
-            link: "",
+            linkDetail: "",
+            position: "",
+            logoImgLink: "",
         }
         temp.title = await container.findElement(By.css(".info-company-stack p:nth-child(1)")).getText();
         temp.company = await container.findElement(By.css(".info-company-stack p:nth-child(2)")).getText();
