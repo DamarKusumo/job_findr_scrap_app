@@ -31,8 +31,6 @@ const save = async (job: string) => {
 
         jobCards.each((_, element) => {
             const jobCard = $(element);
-            // TODO: add logo to interface
-            const companyLogo = jobCard.find('[data-automation="company-logo"] img').attr('src') || '';
             const temp: DataObject = {
                 id: `jobstreet-${jobCard.attr('data-job-id')}`,
                 title: jobCard.find('h3 a[data-automation="jobTitle"]').text().trim(),
@@ -40,9 +38,10 @@ const save = async (job: string) => {
                 location: jobCard.find('a[data-automation="jobLocation"]').text().trim(),
                 company: jobCard.find('a[data-automation="jobCompany"]').text().trim(),
                 sourceSite: "Jobstreet.co.id",
-                link: `https://www.jobstreet.co.id/id/job/${jobCard.attr('data-job-id')}`,
+                linkDetail: `https://www.jobstreet.co.id/id/job/${jobCard.attr('data-job-id')}`,
+                logoImgLink: jobCard.find('[data-automation="company-logo"] img').attr('src') || '',
+                position: job,
             }
-            console.log(companyLogo);
             console.log(temp);
 
             data.push(temp);
@@ -50,7 +49,6 @@ const save = async (job: string) => {
 
     }
     consoleData(data);
-    // saveData(data);
 }
 
 const processDate = (publicationDate: String) => {
