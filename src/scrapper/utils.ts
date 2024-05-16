@@ -6,14 +6,11 @@ import { Options } from "selenium-webdriver/chrome";
 export const initDriver = async (url: string) => {
     var options = new Options()
     options.addArguments("--start-maximized")
-    options.addArguments("-disable-notifications")
     // options.addArguments('--headless')
-    options.addArguments('--no-sandbox')
-    options.addArguments('--disable-dev-shm-usage')
 
     const driver = new selenium.Builder()
         .forBrowser('chrome')
-        // .setChromeOptions(options)
+        .setChromeOptions(options)
         .build();
     await driver.get(url);
     return driver;
@@ -48,3 +45,7 @@ const save = async (data: DataObject) => {
         }
     }
 }
+
+export const delay = (ms: number) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+};
