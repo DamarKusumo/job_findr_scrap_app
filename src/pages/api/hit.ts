@@ -8,8 +8,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  // await karirRunner();
-  // await jobstreetRunner();
+  await karirRunner();
+  await jobstreetRunner();
   await kalibrrRunner();
   res.status(200).json({ status: 200, message: "Finish Hit" });
 }

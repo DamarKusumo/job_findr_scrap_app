@@ -19,7 +19,7 @@ const save = async (job: string) => {
 
     while (true) {
         page++;
-        console.log(`Scraping ${job} page ${page}`)
+        console.log(`Scraping page ${page} of ${jobUrl}`);
         const response = await axios.get(
             jobUrl,
             { params: { page: page } },
@@ -35,20 +35,20 @@ const save = async (job: string) => {
                 id: `jobstreet-${jobCard.attr('data-job-id')}`,
                 title: jobCard.find('h3 a[data-automation="jobTitle"]').text().trim(),
                 publicationDate: processDate(jobCard.find('span[data-automation="jobListingDate"]').text().trim()),
-                location: jobCard.find('a[data-automation="jobLocation"]').text().trim(),
+                location: jobCard.find('a[data-automation="jobLocation"]').map((_, el) => $(el).text()).get().join(', '),
                 company: jobCard.find('a[data-automation="jobCompany"]').text().trim(),
                 sourceSite: "Jobstreet.co.id",
                 linkDetail: `https://www.jobstreet.co.id/id/job/${jobCard.attr('data-job-id')}`,
                 logoImgLink: jobCard.find('[data-automation="company-logo"] img').attr('src') || '',
                 position: job,
             }
-            console.log(temp);
 
             data.push(temp);
         })
 
     }
     consoleData(data);
+    saveData(data);
 }
 
 const processDate = (publicationDate: String) => {
@@ -63,3 +63,4 @@ const processDate = (publicationDate: String) => {
     return `${day}/${month}/${year}`;
 
 }
+
