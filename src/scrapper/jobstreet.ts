@@ -2,6 +2,7 @@ import { DataObject } from "./interface";
 import { saveData, consoleData } from "./utils";
 import axios from "axios";
 import * as cheerio from "cheerio";
+import { formatDate } from "./date-format";
 
 const url = (job: String) => `https://www.jobstreet.co.id/id/${job.split(' ').join('-')}-jobs`;
 
@@ -47,20 +48,20 @@ const save = async (job: string) => {
         })
 
     }
-    consoleData(data);
+
+    console.log(`Finished scraping ${job} from Jobstreet`);
+    console.log(`Found ${data.length} jobs`);
+
     saveData(data);
 }
 
 const processDate = (publicationDate: String) => {
-    let days = publicationDate.split(' ')[0];
     let date = new Date();
+    if (publicationDate.split(' ')[1] != 'hari') return formatDate(date);
+    let days = publicationDate.split(' ')[0];
     if (days.includes('+'))
         days = '30';
     date.setDate(date.getDate() - parseInt(days));
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear().toString();
-    return `${day}/${month}/${year}`;
-
+    return formatDate(date);
 }
 

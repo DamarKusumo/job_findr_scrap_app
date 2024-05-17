@@ -2,6 +2,8 @@ import { By, until } from "selenium-webdriver";
 import { DataObject } from "./interface";
 import { saveData, initDriver, consoleData } from "./utils";
 import * as cheerio from "cheerio";
+import axios from "axios";
+import { formatDate } from "./date-format";
 
 const url = (job: String) => `https://www.kalibrr.com/home/te/${job.split(' ').join('-')}/co/Indonesia`;
 
@@ -13,7 +15,7 @@ export const kalibrrRunner = async () => {
 }
 
 const save = async (job: string) => {
-    const data: DataObject[] = [];
+    let data: DataObject[] = [];
     const driver = await initDriver(url(job));
     while (true) {
         await driver.executeScript("window.scrollTo(0, document.body.scrollHeight)");
@@ -25,6 +27,7 @@ const save = async (job: string) => {
     }
 
     const $ = cheerio.load(await driver.getPageSource());
+    await driver.quit();
 
     $('.k-font-dm-sans.k-rounded-lg.k-bg-white.k-border-solid.k-border.k-border.k-group.k-flex.k-flex-col.k-justify-between.css-1otdiuc').each((_, element) => {
         const jobCard = $(element);
@@ -32,7 +35,7 @@ const save = async (job: string) => {
         let temp: DataObject = {
             id: `kalibrr-${jobCard.find('a.k-text-black[itemprop="name"]').attr('href')?.split('/')[4]}`,
             title: jobCard.find('a.k-text-black[itemprop="name"]').text().trim(),
-            publicationDate: processDate($(jobCard.find('.k-flex.k-gap-4.k-text-gray-300 span')[3]).text().trim()),
+            publicationDate: '',
             location: $(jobCard.find('.k-flex.k-gap-4.k-text-gray-300 span')[0]).text().trim(),
             company: jobCard.find('a.k-text-subdued.k-font-bold').text().trim(),
             sourceSite: "kalibrr.com",
@@ -40,23 +43,62 @@ const save = async (job: string) => {
             logoImgLink: jobCard.find('img.k-block').attr('src') || '',
             position: job,
         };
+        getDatePublished(temp.linkDetail);
         data.push(temp);
     });
 
-    driver.quit();
+    for (const job of data) {
+        const publicationDate = await getDatePublished(job.linkDetail);
+        job.publicationDate = formatDate(publicationDate);
+    }
+
+    console.log("Fetching date published for kalibrr: " + job);
+
+    const now = new Date();
+    data = data.filter((job) => {
+        const jobDate = new Date(job.publicationDate);
+        return (now.getFullYear() - jobDate.getFullYear()) * 12 + now.getMonth() - jobDate.getMonth() < 2;
+    });
+
+    console.log("Finished scraping kalibrr: " + job);
+    console.log('Found ' + data.length + ' jobs');
+
     saveData(data);
-    consoleData(data);
+
 }
 
-const processDate = (timeString: String) => {
-    let splitted = timeString.split(' ');
-    let date = new Date();
-    if (splitted[4] in ['hours', 'hour', 'minutes', 'minute', 'seconds', 'second'])
-        date = new Date();
-    if (splitted[4] in ['days', 'day'])
-        date.setDate(date.getDate() - parseInt(splitted[3]));
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear().toString();
-    return `${day}/${month}/${year}`;
+const getDatePublished = async (link: string): Promise<Date> => {
+    const response = await axios.get(link);
+    const $ = cheerio.load(response.data);
+
+    const date = new Date();
+    const postedText = $('div.k-text-subdued.k-text-caption.md\\:k-text-right > p').first().text()
+    const splitted = postedText.split(' ');
+
+    if (splitted[1] == 'a')
+        splitted[1] = '1';
+
+    if (splitted[0] == 'Expired') {
+        date.setFullYear(1970)
+        return date;
+    }
+
+    if (splitted[2] in ['few', 'second', 'seconds', 'minute', 'minutes', 'hour', 'hours']) return date;
+
+    if (splitted[2] == 'day' || splitted[2] == 'days') {
+        date.setDate(date.getDate() - parseInt(splitted[1]));
+        return date;
+    }
+
+    if (splitted[2] == 'month' || splitted[2] == 'months') {
+        date.setMonth(date.getMonth() - parseInt(splitted[1]));
+        return date;
+    }
+
+    if (splitted[2] == 'year' || splitted[2] == 'years') {
+        date.setFullYear(date.getFullYear() - parseInt(splitted[1]));
+        return date;
+    }
+
+    return date;
 }
