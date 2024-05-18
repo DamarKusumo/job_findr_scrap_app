@@ -22,7 +22,7 @@ export const karirRunner = async () => {
     if (cyberSecurity !== undefined) for (const d of cyberSecurity) res.push(d);
 
     driver.quit();
-    consoleData(res);
+    saveData(res);
     return res.length;
 }
 

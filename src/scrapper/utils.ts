@@ -5,6 +5,7 @@ import { Options } from "selenium-webdriver/chrome";
 
 export const initDriver = async (url: string) => {
     const opt = new Options();
+    opt.addArguments("--start-maximized")
     opt.addArguments('--ignore-ssl-errors=yes');
     opt.addArguments('--ignore-certificate-errors');
     let driver: selenium.WebDriver;

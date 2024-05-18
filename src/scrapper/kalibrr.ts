@@ -17,7 +17,8 @@ export const kalibrrRunner = async () => {
     if (network) for (const d of network) res.push(d);
     const cs = await save("Cyber Security");
     if (cs) for (const d of cs) res.push(d);
-    consoleData(res);
+    // consoleData(res);
+    saveData(res);
     return res.length;
 }
 

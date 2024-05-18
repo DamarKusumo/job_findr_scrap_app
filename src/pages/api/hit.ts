@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { karirRunner } from "../../scrapper/karir";
 import { jobstreetRunner } from "../../scrapper/jobstreet";
 import { kalibrrRunner } from "../../scrapper/kalibrr";
+import { linkedinRunner } from "../../scrapper/linkedin";
 
 export default async function handler(
   req: NextApiRequest,
@@ -30,5 +31,14 @@ export default async function handler(
     } catch (error) {
       res.status(500).json({ status: 500, message: "Internal Server Error" });
     }
+  } else if (source === "linkedin") {
+    try {
+      const dataLen = await linkedinRunner();
+      res.status(200).json({ status: 200, message: "Finish Hit, Data length: " + dataLen });
+    } catch (error) {
+      res.status(500).json({ status: 500, message: "Internal Server Error" });
+    }
+  } else {
+    res.status(400).json({ status: 400, message: "Bad Request, no source" });
   }
 }
