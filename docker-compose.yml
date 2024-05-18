@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  selenium:
+    image: selenium/standalone-chrome:latest
+    ports:
+      - "4444:4444"
+      - "7900:7900"
+    shm_size: 2g
+
+  scrapperapp:
+    build:
+      context: .
+    environment:
+      - NEXT_PUBLIC_API_URL=https://job-findr-app.vercel.app/api/data
+      - SELENIUM_SERVER=http://selenium:4444/wd/hub
+    depends_on:
+      - selenium
+    links:
+      - selenium
+    ports:
+      - '3000:3000'
+      
