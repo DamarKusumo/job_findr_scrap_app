@@ -7,7 +7,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  await karirRunner();
-  // await linkedinRunner();
-  res.status(200).json({ status: 200, message: "Finish Hit" });
+  const dataLen = await karirRunner();
+  res.status(200).json({ status: 200, message: "Finish Hit, Data length: " + dataLen });
 }

@@ -20,6 +20,7 @@ export const consoleData = (data: DataObject[]) => {
     data.forEach(async item => {
         console.log(item);
     });
+    console.log(data.length);
 }
 
 export const saveData = (data: DataObject[]) => {
@@ -29,7 +30,7 @@ export const saveData = (data: DataObject[]) => {
 }
 
 const save = async (data: DataObject) => {
-    const url = 'http://localhost:3000/api/data';
+    const url = process.env.NEXT_PUBLIC_API_URL as string;
     try {
         const response = await axios.post(url, data);
         console.log(response.data);
@@ -45,7 +46,6 @@ const save = async (data: DataObject) => {
         }
     }
 }
-
-export const delay = (ms: number) => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-};
+export const sleep = (ms: number) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
