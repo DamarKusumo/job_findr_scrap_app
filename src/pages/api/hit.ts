@@ -8,5 +8,6 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   const dataLen = await karirRunner();
+  // const dataLen = await linkedinRunner();
   res.status(200).json({ status: 200, message: "Finish Hit, Data length: " + dataLen });
 }

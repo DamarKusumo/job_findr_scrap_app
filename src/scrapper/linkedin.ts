@@ -1,35 +1,48 @@
-import { By, WebDriver, until } from "selenium-webdriver";
+import { By, WebDriver } from "selenium-webdriver";
 import { DataObject } from "./interface";
-import { saveData, initDriver, consoleData, delay } from "./utils";
+import { saveData, initDriver, consoleData, sleep as delay } from "./utils";
 
 const BASE_URL = (jobType: string) =>
   `https://www.linkedin.com/jobs/search/?keywords=${jobType}&location=Indonesia`;
 
 export const linkedinRunner = async () => {
-  await scrape("Programmer");
-  // await scrape("Data");
-  // await scrape("Network");
-  // await scrape("Cyber Security");
+  var res: DataObject[] = [];
+
+  let programmer = await scrape("Programmer");
+  if (programmer !== undefined) for (const d of programmer) res.push(d);
+  let data = await scrape("Data");
+  if (data !== undefined) for (const d of data) res.push(d);
+  let network = await scrape("Network");
+  if (network !== undefined) for (const d of network) res.push(d);
+  let cyberSecurity = await scrape("Cyber Security");
+  if (cyberSecurity !== undefined) for (const d of cyberSecurity) res.push(d);
+
+  consoleData(res);
+  // saveData(res)
+  return res.length;
 };
 
 const scrape = async (jobType: string) => {
   const driver = await initDriver(BASE_URL(jobType));
+  var data;
   // limit retries to max 3 times
   try {
-    await getData(driver, jobType);
+    data = await getData(driver, jobType);
   } catch {
     await driver.get(BASE_URL(jobType));
     try {
-      await getData(driver, jobType);
+      data = await getData(driver, jobType);
     } catch {
       await driver.get(BASE_URL(jobType));
       try {
-        await getData(driver, jobType);
+        data = await getData(driver, jobType);
       } catch {
         await driver.quit();
         console.error(`Unable to scrape ${jobType} jobs from LinkedIn`);
       }
     }
+  } finally {
+    return data;
   }
 };
 
@@ -80,16 +93,16 @@ const getData = async (driver: WebDriver, jobType: string) => {
     let temp: DataObject = {
       id: "",
       title: "",
-      publicationDate: "",
+      publicationDate: publicationDate,
       location: "",
       company: "",
-      sourceSite: "LinkedIn Job",
+      sourceSite: "Linkedin.com/jobs",
       linkDetail: "",
       logoImgLink: "",
       position: jobType,
     };
 
-    // handle lazy load huhu
+    // handle lazy load
     let companyImg = await job.findElement(
       By.className("artdeco-entity-image")
     );
@@ -97,7 +110,10 @@ const getData = async (driver: WebDriver, jobType: string) => {
       "arguments[0].scrollIntoView(true);",
       companyImg
     );
-    temp.logoImgLink = await companyImg.getAttribute("src");
+    let logoImgLink = await companyImg.getAttribute("src");
+    temp.logoImgLink = logoImgLink
+      ? logoImgLink
+      : "https://static.licdn.com/aero-v1/sc/h/9a9u41thxt325ucfh5z8ga4m8";
     temp.id = "linkedin:".concat(
       (
         await job
@@ -110,8 +126,6 @@ const getData = async (driver: WebDriver, jobType: string) => {
     temp.title = await job
       .findElement(By.className("base-search-card__title"))
       .getAttribute("innerText");
-    let splitDate = publicationDate.split("-");
-    temp.publicationDate = `${splitDate[2]}/${splitDate[1]}/${splitDate[0]}`;
     temp.location = await job
       .findElement(By.className("job-search-card__location"))
       .getAttribute("innerText");
@@ -124,6 +138,5 @@ const getData = async (driver: WebDriver, jobType: string) => {
   }
 
   await driver.quit();
-  console.log(data);
-  console.log("total", data.length);
+  return data;
 };
