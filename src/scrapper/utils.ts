@@ -1,11 +1,29 @@
 import axios, { AxiosError } from "axios"
 import { DataObject } from "./interface";
 import selenium from 'selenium-webdriver';
+import { Options } from "selenium-webdriver/chrome";
 
 export const initDriver = async (url: string) => {
-    const driver = new selenium.Builder()
+    const opt = new Options();
+    opt.addArguments("--start-maximized")
+    opt.addArguments('--ignore-ssl-errors=yes');
+    opt.addArguments('--ignore-certificate-errors');
+    let driver: selenium.WebDriver;
+    console.log(process.env.SELENIUM_SERVER as string)
+    if (process.env.NODE_ENV === 'development') {
+        driver = new selenium.Builder()
         .forBrowser('chrome')
+        .setChromeOptions(opt)
         .build();
+        console.log("dev")
+    } else {
+        driver = new selenium.Builder()
+        .forBrowser('chrome')
+        .setChromeOptions(opt)
+        .usingServer(process.env.SELENIUM_SERVER as string || 'http://localhost:4444/wd/hub')
+        .build();
+        console.log("prod");
+    }
     await driver.get(url);
     return driver;
 }

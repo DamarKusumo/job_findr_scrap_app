@@ -1,6 +1,7 @@
 import { By, until, Key } from "selenium-webdriver";
 import { DataObject } from "./interface";
-import { saveData, initDriver, consoleData, sleep } from "./utils";
+import { initDriver,  sleep, consoleData, saveData } from "./utils";
+import { formatDate } from "./date-format";
 
 const baseURL = 'https://karir.com/search-lowongan';
 
@@ -10,16 +11,18 @@ export const karirRunner = async () => {
 
     const programmer = await searchByJob("Programmer", driver);
     if (programmer !== undefined) for (const d of programmer) res.push(d);
+
     const data = await searchByJob("Data", driver);
-    console.log(data?.length);
     if (data !== undefined) for (const d of data) res.push(d);
+
     const network = await searchByJob("Network", driver);
     if (network !== undefined) for (const d of network) res.push(d);
+
     const cyberSecurity = await searchByJob("Cyber Security", driver);
     if (cyberSecurity !== undefined) for (const d of cyberSecurity) res.push(d);
-    driver.quit();
 
-    consoleData(res);
+    driver.quit();
+    saveData(res);
     return res.length;
 }
 
@@ -34,6 +37,7 @@ const searchByJob = async (job: string, driver: any) => {
         const currentUrl = await driver.getCurrentUrl();
         return currentUrl === (baseURL + `?keyword=${encodeURIComponent(job)}`);
     }, 10000, 'URL did not match expected value');
+
     try {
         await driver.wait(until.elementLocated(By.className("pagination")), 10000);
     } catch {
@@ -42,6 +46,7 @@ const searchByJob = async (job: string, driver: any) => {
     const pagination = await driver.findElement(By.className("pagination"));
     const pages = await pagination.findElements(By.xpath(".//div"));
     const pagesLen = pages.length;
+
     for (let i = 0; i < pagesLen; i++) {
         const nextPage = pages[i];
         await nextPage.click();
@@ -66,7 +71,7 @@ const searchByJob = async (job: string, driver: any) => {
 
             await driver.wait(until.elementLocated(By.xpath("(//p[@type='Body2'])[6]")), 10000);
             const strPubDate = (await driver.findElement(By.xpath("(//p[@type='Body2'])[6]")).getText());
-            const formatedDate = formatDate(strPubDate);
+            const formatedDate = formatDateKarir(strPubDate);
             if (!formatedDate) continue;
             temp.publicationDate = formatedDate
 
@@ -86,7 +91,7 @@ const searchByJob = async (job: string, driver: any) => {
     return data;
 }
 
-const formatDate = (strDate: string) => {
+const formatDateKarir = (strDate: string) => {
     const totalDate = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     const today = new Date();
     let day = today.getDate();
@@ -112,6 +117,7 @@ const formatDate = (strDate: string) => {
     } else if (strTime.toLowerCase() === "tahun") {
         return null
     }
+    const resDate = new Date(`${year}-${month}-${day}`);
 
-    return `${year}-${month}-${day}`
+    return formatDate(resDate);
 }
