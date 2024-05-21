@@ -17,10 +17,12 @@ export const initDriver = async (url: string) => {
         .build();
         console.log("dev")
     } else {
+        opt.addArguments("--headless")
+        opt.addArguments("--disable-gpu")
+        opt.addArguments("--no-sandbox")
         driver = new selenium.Builder()
         .forBrowser('chrome')
         .setChromeOptions(opt)
-        .usingServer(process.env.SELENIUM_SERVER as string || 'http://localhost:4444/wd/hub')
         .build();
         console.log("prod");
     }
