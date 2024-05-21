@@ -14,6 +14,8 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
 RUN mkdir -p /opt/app
 WORKDIR /opt/app
 
+ENV NEXT_PUBLIC_API_URL="https://job-findr-app.vercel.app/api/data"
+
 COPY ./package.json ./package-lock.json ./tsconfig.json ./
 
 RUN npm install 
