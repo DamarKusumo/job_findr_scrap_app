@@ -15,6 +15,7 @@ export default async function handler(
       const dataLen = await karirRunner();
       res.status(200).json({ status: 200, message: "Finish Hit, Data length: " + dataLen });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ status: 500, message: "Internal Server Error" });
     }
   } else if (source === "jobstreet") {
@@ -22,6 +23,7 @@ export default async function handler(
       const dataLen = await jobstreetRunner();
       res.status(200).json({ status: 200, message: "Finish Hit, Data length: " + dataLen });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ status: 500, message: "Internal Server Error" });
     }
   } else if (source === "kalibrr") {
@@ -29,6 +31,7 @@ export default async function handler(
       const dataLen = await kalibrrRunner();
       res.status(200).json({ status: 200, message: "Finish Hit, Data length: " + dataLen });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ status: 500, message: "Internal Server Error" });
     }
   } else if (source === "linkedin") {
@@ -36,6 +39,7 @@ export default async function handler(
       const dataLen = await linkedinRunner();
       res.status(200).json({ status: 200, message: "Finish Hit, Data length: " + dataLen });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ status: 500, message: "Internal Server Error" });
     }
   } else {

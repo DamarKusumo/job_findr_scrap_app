@@ -1,32 +1,47 @@
 import axios, { AxiosError } from "axios"
 import { DataObject } from "./interface";
+// import { remote } from 'webdriverio';
 import selenium from 'selenium-webdriver';
-import { Options } from "selenium-webdriver/chrome";
+import { Options, ServiceBuilder } from "selenium-webdriver/chrome";
 
 export const initDriver = async (url: string) => {
+    // const service = new ServiceBuilder("/usr/bin/google-chrome-stable");
     const opt = new Options();
-    opt.addArguments("--start-maximized")
     opt.addArguments('--ignore-ssl-errors=yes');
     opt.addArguments('--ignore-certificate-errors');
+    // opt.addArguments("--headless");
     let driver: selenium.WebDriver;
-    console.log(process.env.SELENIUM_SERVER as string)
-    if (process.env.NODE_ENV === 'development') {
-        driver = new selenium.Builder()
-        .forBrowser('chrome')
-        .setChromeOptions(opt)
-        .build();
+    driver = new selenium.Builder()
+            .forBrowser('chrome')
+            // .setChromeService(service)
+            .setChromeOptions(opt)
+            .build();
         console.log("dev")
-    } else {
-        opt.addArguments("--headless")
-        opt.addArguments("--disable-gpu")
-        opt.addArguments("--no-sandbox")
-        driver = new selenium.Builder()
-        .forBrowser('chrome')
-        .setChromeOptions(opt)
-        .build();
-        console.log("prod");
-    }
-    await driver.get(url);
+        await driver.get(url);
+    // if (process.env.NODE_ENV === 'development') {
+    //     driver = new selenium.Builder()
+    //         .forBrowser('chrome')
+    //         .setChromeOptions(opt)
+    //         .build();
+    //     console.log("dev")
+    //     await driver.get(url);
+    // } else {
+    //     driver = await remote({
+    //         capabilities: {
+    //             browserName: 'chrome',
+    //             'goog:chromeOptions': {
+    //                 args: [
+    //                     '--headless',
+    //                     '--disable-gpu',
+    //                     'window-size=1024,768',
+    //                     '--no-sandbox'
+    //                 ]
+    //             }
+    //         }
+    //     });
+        // await driver.url(url);
+    // }
+
     return driver;
 }
 
