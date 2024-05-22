@@ -9,6 +9,8 @@ RUN dpkg -i google-chrome-stable_current_amd64.deb; apt-get -fy install
 RUN mkdir -p /opt/app
 WORKDIR /opt/app
 
+ENV NEXT_PUBLIC_API_URL="https://job-findr-app.vercel.app/api/data"
+
 COPY ./package.json ./package-lock.json ./tsconfig.json ./
 
 RUN npm install 

@@ -44,7 +44,7 @@ export const saveData = (data: DataObject[]) => {
 }
 
 const save = async (data: DataObject) => {
-    const url = process.env.NEXT_PUBLIC_API_URL as string;
+    const url = process.env.NEXT_PUBLIC_API_URL ? process.env.NEXT_PUBLIC_API_URL as string : "http://localhost:3000/api/data";
     try {
         const response = await axios.post(url, data);
         console.log(response.data);
